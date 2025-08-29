@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-enum WalletStatus {
+export enum WalletStatus {
   ACITVE = "ACTIVE",
   SUSPEND = "SUSPEND",
   BLOCKED = "BLOCKED",
