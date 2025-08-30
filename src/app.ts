@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { router } from "./app/routes";
+import notFound from "./app/middlewares/notFound";
+import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 
 const app = express();
 
@@ -16,5 +18,9 @@ app.get("/", (req: Request, res: Response) => {
     message: "Welcome to Digital Wallet System",
   });
 });
+
+app.use(globalErrorHandler);
+
+app.use(notFound);
 
 export default app;
