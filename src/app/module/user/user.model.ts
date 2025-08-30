@@ -9,8 +9,13 @@ const UserSchema = new Schema<IUser>(
     role: {
       type: String,
       enum: Object.values(UserRole),
+      default: UserRole.USER,
     },
-    status: { type: String, enum: Object.values(UserStatus) },
+    status: {
+      type: String,
+      enum: Object.values(UserStatus),
+      default: UserStatus.ACTIVE,
+    },
     wallet_id: { type: Schema.Types.ObjectId, unique: true },
   },
   { versionKey: false, timestamps: true }

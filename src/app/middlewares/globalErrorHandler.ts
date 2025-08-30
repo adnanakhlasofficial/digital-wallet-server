@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-const globalErrorHandler = async (
+export const globalErrorHandler = async (
   err: any,
   req: Request,
   res: Response,
@@ -9,6 +9,11 @@ const globalErrorHandler = async (
   let statusCode = 500;
   let message = "Something went wrong.";
   let error = JSON.parse(err);
+
+  if (err instanceof Error) {
+    statusCode = 500;
+    message = err.message;
+  }
 
   res.status(statusCode).json({
     success: false,

@@ -5,7 +5,7 @@ import { UserValidation } from "./user.validation";
 
 const router = Router();
 
-router.use(
+router.post(
   "/register",
   validateRequest(UserValidation.UserZodSchema),
   UserController.createUser

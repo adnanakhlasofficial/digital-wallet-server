@@ -20,4 +20,6 @@ export interface IUser {
   wallet_id: Types.ObjectId;
   role: UserRole;
   status: UserStatus;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

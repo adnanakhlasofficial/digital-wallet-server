@@ -1,14 +1,7 @@
-import z from "zod";
+import bcryptjs from "bcryptjs";
 import { env } from "../../config/env";
 import { IUser } from "./user.interface";
 import { UserModel } from "./user.model";
-import bcryptjs from "bcryptjs";
-
-const UserZodSchema = z.object({
-  phone: z.string().regex(/^(?:\+?88)?01[3-9]\d{8}$/),
-  username: z.string(),
-  password: z.string(),
-});
 
 const createUser = async (payload: Partial<IUser>) => {
   const { username, password, phone } = payload;
