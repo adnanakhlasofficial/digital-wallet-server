@@ -9,6 +9,8 @@ interface IENV {
   JWT_ACCESS_SECRET: string;
   JWT_REFRESH_SECRET: string;
   BCRYPT_SALT: string;
+  ADMIN_PHONE: string;
+  ADMIN_PASSWORD: string;
 }
 
 type TENV = keyof IENV;
@@ -21,6 +23,8 @@ function checkRequiredEnv() {
     "JWT_ACCESS_SECRET",
     "JWT_REFRESH_SECRET",
     "BCRYPT_SALT",
+    "ADMIN_PHONE",
+    "ADMIN_PASSWORD",
   ];
   let env: any = {};
   envList.forEach((singleEnv: string) => {

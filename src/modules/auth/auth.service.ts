@@ -5,11 +5,12 @@ import { UserModel } from "../user/user.model";
 import { ILogin } from "./auth.interface";
 import bcrypt from "bcryptjs";
 import { UserStatus } from "../user/user.interface";
+import { Types } from "mongoose";
 
 const login = async (payload: Partial<ILogin>) => {
   const user = await UserModel.findOne({ phone: payload.phone }).populate(
     "wallet",
-    "-_id -user"
+    "_id -user"
   );
 
   if (!user) {
@@ -32,6 +33,8 @@ const login = async (payload: Partial<ILogin>) => {
     status: user.status,
     phone: user.phone,
     name: user.name,
+    wallet: (user.wallet?._id as Types.ObjectId) || null,
+    _id: user._id,
   };
 
   const accessToken = generateToken(jwtUser, env.JWT_ACCESS_SECRET, "1d");
@@ -52,8 +55,8 @@ const refreshToken = async (payload: string) => {
     throw new Error(`User is ${user.status}`);
   }
 
-  const { name, phone, password, role, status } = user.toObject();
-  const jwtUser = { name, phone, password, role, status };
+  const { name, phone, role, status, _id, wallet } = user.toObject();
+  const jwtUser = { name, phone, role, status, _id, wallet };
 
   const newAccessToken = generateToken(jwtUser, env.JWT_ACCESS_SECRET, "1d");
   return newAccessToken;

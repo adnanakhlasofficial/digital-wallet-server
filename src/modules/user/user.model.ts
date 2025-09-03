@@ -27,8 +27,11 @@ const UserSchema = new Schema<IUser>(
   { versionKey: false, timestamps: true }
 );
 
-UserSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function () {
   try {
+    if (this.role === UserRole.ADMIN) {
+      return;
+    }
     if (!this.wallet) {
       const id = { user: this._id };
       const wallet = await WalletModel.create(id);
@@ -37,7 +40,6 @@ UserSchema.pre("save", async function (next) {
   } catch (error) {
     console.log(error);
   }
-  next();
 });
 
 export const UserModel = model("users", UserSchema);
