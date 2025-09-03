@@ -5,12 +5,23 @@ dotenv.config();
 interface IENV {
   PORT: string;
   MONGODB_URI: string;
+  NODE_ENV: string;
+  JWT_ACCESS_SECRET: string;
+  JWT_REFRESH_SECRET: string;
+  BCRYPT_SALT: string;
 }
 
 type TENV = keyof IENV;
 
 function checkRequiredEnv() {
-  const envList: TENV[] = ["MONGODB_URI", "PORT"];
+  const envList: TENV[] = [
+    "MONGODB_URI",
+    "PORT",
+    "NODE_ENV",
+    "JWT_ACCESS_SECRET",
+    "JWT_REFRESH_SECRET",
+    "BCRYPT_SALT",
+  ];
   let env: any = {};
   envList.forEach((singleEnv: string) => {
     if (!process.env[singleEnv]) {
