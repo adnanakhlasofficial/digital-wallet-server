@@ -8,4 +8,12 @@ const getAllWallets = async () => {
   return wallets;
 };
 
-export const WalletService = { getAllWallets };
+const getSingleWallet = async (payload: string) => {
+  const wallet = await WalletModel.findById(payload).populate(
+    "user",
+    "-_id -password -wallet"
+  );
+  return wallet;
+};
+
+export const WalletService = { getAllWallets, getSingleWallet };

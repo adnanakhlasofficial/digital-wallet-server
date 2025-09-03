@@ -13,4 +13,14 @@ const getAllWallets = async (req: Request, res: Response) => {
   });
 };
 
-export const WalletController = { getAllWallets };
+const getSingleWallet = async (req: Request, res: Response) => {
+  const wallet = await WalletService.getSingleWallet(req.params.id);
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Wallet retrieved successfully",
+    data: wallet,
+  });
+};
+
+export const WalletController = { getAllWallets, getSingleWallet };
