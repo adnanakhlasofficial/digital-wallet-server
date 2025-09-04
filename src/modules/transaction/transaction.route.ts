@@ -23,13 +23,13 @@ router.get(
   TransactionController.getUserTransactions
 );
 
-router.get(
+router.patch(
   "/approve/:id",
   checkAuth(UserRole.ADMIN),
   TransactionController.approveTransaction
 );
 
-router.get(
+router.patch(
   "/reverse/:id",
   checkAuth(UserRole.ADMIN),
   TransactionController.reverseTransaction

@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import { sendResponse } from "../../utils/send-response";
 import { WalletService } from "./wallet.service";
 import httpStatus from "http-status-codes";
+import { catchAsync } from "../../utils/catch-async";
 
-const getAllWallets = async (req: Request, res: Response) => {
+const getAllWallets = catchAsync(async (req: Request, res: Response) => {
   const wallets = await WalletService.getAllWallets();
   sendResponse(res, {
     status: httpStatus.OK,
@@ -11,9 +12,9 @@ const getAllWallets = async (req: Request, res: Response) => {
     message: "All wallets retrieved successfully",
     data: wallets,
   });
-};
+});
 
-const getSingleWallet = async (req: Request, res: Response) => {
+const getSingleWallet = catchAsync(async (req: Request, res: Response) => {
   const wallet = await WalletService.getSingleWallet(req.params.id);
   sendResponse(res, {
     status: httpStatus.OK,
@@ -21,6 +22,33 @@ const getSingleWallet = async (req: Request, res: Response) => {
     message: "Wallet retrieved successfully",
     data: wallet,
   });
-};
+});
 
-export const WalletController = { getAllWallets, getSingleWallet };
+const blockWallet = catchAsync(async (req: Request, res: Response) => {
+  const walletId = req.params.id;
+  const walletResponse = await WalletService.blockWallet(walletId);
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Wallet blocked successfully",
+    data: walletResponse,
+  });
+});
+
+const unBlockWallet = catchAsync(async (req: Request, res: Response) => {
+  const walletId = req.params.id;
+  const walletResponse = await WalletService.unBlockWallet(walletId);
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Wallet blocked successfully",
+    data: walletResponse,
+  });
+});
+
+export const WalletController = {
+  getAllWallets,
+  getSingleWallet,
+  blockWallet,
+  unBlockWallet,
+};
