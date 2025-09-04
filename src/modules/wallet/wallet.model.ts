@@ -9,7 +9,11 @@ const WalletSchema = new Schema<IWallet>(
       required: true,
       unique: true,
     },
-    balance: { type: Number, required: true, default: 50 },
+    balance: {
+      type: Number,
+      required: true,
+      default: 50,
+    },
     status: {
       type: String,
       enum: Object.values(WalletStatus),
@@ -21,5 +25,9 @@ const WalletSchema = new Schema<IWallet>(
     timestamps: true,
   }
 );
+
+// WalletSchema.pre("findOneAndUpdate", async function () {
+//   console.log(this);
+// });
 
 export const WalletModel = model("wallets", WalletSchema);

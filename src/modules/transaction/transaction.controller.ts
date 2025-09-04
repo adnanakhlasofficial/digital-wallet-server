@@ -39,8 +39,40 @@ const getUserTransactions = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const approveTransaction = catchAsync(async (req: Request, res: Response) => {
+  const transactionId = req.params.id;
+  const admin = req.user;
+  const transactionResponse = await TransactionService.approveTransaction(
+    transactionId,
+    admin
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Transaction approved successfully",
+    data: transactionResponse,
+  });
+});
+
+const reverseTransaction = catchAsync(async (req: Request, res: Response) => {
+  const transactionId = req.params.id;
+  const transactionResponse = await TransactionService.reverseTransaction(
+    transactionId
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Transaction approved successfully",
+    data: transactionResponse,
+  });
+});
+
 export const TransactionController = {
   sendMoney,
   getAllTransactions,
   getUserTransactions,
+  approveTransaction,
+  reverseTransaction,
 };

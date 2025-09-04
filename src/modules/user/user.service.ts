@@ -32,4 +32,16 @@ const getSingleUser = async (payload: string) => {
   return user;
 };
 
-export const UserService = { createUser, getAllUsers, getSingleUser };
+const getUserMe = async (id: string) => {
+  const user = await UserModel.findById(id)
+    .select("-password")
+    .populate("wallet", "-Id");
+  return user;
+};
+
+export const UserService = {
+  createUser,
+  getAllUsers,
+  getSingleUser,
+  getUserMe,
+};

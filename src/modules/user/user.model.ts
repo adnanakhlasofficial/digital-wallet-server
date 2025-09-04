@@ -29,9 +29,6 @@ const UserSchema = new Schema<IUser>(
 
 UserSchema.pre("save", async function () {
   try {
-    if (this.role === UserRole.ADMIN) {
-      return;
-    }
     if (!this.wallet) {
       const id = { user: this._id };
       const wallet = await WalletModel.create(id);

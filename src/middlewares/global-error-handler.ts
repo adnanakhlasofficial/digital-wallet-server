@@ -26,6 +26,7 @@ export const globalErrorHandler = (
   if (err instanceof AppError) {
     statusCode = err.status;
     message = err.message;
+    error = err.stack;
   } else if (err instanceof Error) {
     statusCode = httpStatus.BAD_REQUEST;
     message = err.message;
