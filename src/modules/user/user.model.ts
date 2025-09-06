@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { CallbackError, model, Schema } from "mongoose";
 import { WalletService } from "../wallet/wallet.service";
 import { IUser, UserRole, UserStatus } from "./user.interface";
 import { WalletModel } from "../wallet/wallet.model";
@@ -27,15 +27,17 @@ const UserSchema = new Schema<IUser>(
   { versionKey: false, timestamps: true }
 );
 
-UserSchema.pre("save", async function () {
+UserSchema.pre("save", async function (next) {
   try {
     if (!this.wallet) {
       const id = { user: this._id };
       const wallet = await WalletModel.create(id);
       this.wallet = wallet._id;
     }
+    next();
   } catch (error) {
     console.log(error);
+    next(error as CallbackError);
   }
 });
 

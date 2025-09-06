@@ -21,6 +21,7 @@ const TransactionSchema = new Schema<ITransaction>(
       required: true,
     },
     fee: { type: Number, required: true, default: 5 },
+    commission: { type: Number },
     from_wallet: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -46,15 +47,21 @@ const TransactionSchema = new Schema<ITransaction>(
 );
 
 TransactionSchema.pre("validate", async function (next) {
-  const transaction = this as any;
+  const transaction = this;
 
   try {
     const wallet = await WalletModel.findById(transaction.from_wallet);
     if (!wallet) {
       return next(new Error("Wallet not found"));
     }
+    let totalAmount = transaction.amount + transaction.fee;
 
-    if (transaction.amount > wallet.balance) {
+    if (transaction.commission) {
+      const commission = (transaction.commission / 100) * transaction.amount;
+      totalAmount += commission;
+    }
+
+    if (totalAmount > wallet.balance) {
       return next(new Error("Amount exceeds available wallet balance"));
     }
 
@@ -65,16 +72,25 @@ TransactionSchema.pre("validate", async function (next) {
 });
 
 TransactionSchema.pre("save", async function (next) {
+  const transaction = this;
+
   try {
-    const totalMoney = this.amount + this.fee;
-    const wallet = await WalletModel.findById(this.from_wallet);
+    let totalMoney = transaction.amount + transaction.fee;
+
+    if (transaction.commission) {
+      const commission = (transaction.commission / 100) * transaction.amount;
+      totalMoney += commission;
+    }
+
+    const wallet = await WalletModel.findById(transaction.from_wallet);
     if (!wallet) {
       throw new AppError(httpStatus.BAD_REQUEST, "Wallet not found");
     }
     const leftBalance = wallet.balance - totalMoney;
-    await WalletModel.findByIdAndUpdate(this.from_wallet, {
+    await WalletModel.findByIdAndUpdate(transaction.from_wallet, {
       balance: leftBalance,
     });
+
     next();
   } catch (error) {
     next(error as CallbackError);

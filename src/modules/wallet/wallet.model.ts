@@ -26,8 +26,4 @@ const WalletSchema = new Schema<IWallet>(
   }
 );
 
-// WalletSchema.pre("findOneAndUpdate", async function () {
-//   console.log(this);
-// });
-
 export const WalletModel = model("wallets", WalletSchema);

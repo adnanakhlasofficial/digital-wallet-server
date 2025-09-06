@@ -7,8 +7,19 @@ const router = Router();
 
 router.post(
   "/send-money",
-  checkAuth(UserRole.USER, UserRole.AGENT),
+  checkAuth(UserRole.USER),
   TransactionController.sendMoney
+);
+router.post(
+  "/cash-out",
+  checkAuth(UserRole.USER),
+  TransactionController.cashOut
+);
+
+router.post(
+  "/cash-in",
+  checkAuth(UserRole.AGENT),
+  TransactionController.cashIn
 );
 
 router.get(

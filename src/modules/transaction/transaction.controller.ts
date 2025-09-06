@@ -17,6 +17,32 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const cashOut = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const payload = req.body;
+
+  const transaction = await TransactionService.cashOut(user, payload);
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "Request received. Admin approval is in progress",
+    data: transaction,
+  });
+});
+
+const cashIn = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const payload = req.body;
+
+  const transaction = await TransactionService.cashIn(user, payload);
+  sendResponse(res, {
+    status: httpStatus.CREATED,
+    success: true,
+    message: "Request received. Admin approval is in progress",
+    data: transaction,
+  });
+});
+
 const getAllTransactions = catchAsync(async (req: Request, res: Response) => {
   const allTransactions = await TransactionService.getAllTransactions();
   sendResponse(res, {
@@ -71,6 +97,8 @@ const reverseTransaction = catchAsync(async (req: Request, res: Response) => {
 
 export const TransactionController = {
   sendMoney,
+  cashOut,
+  cashIn,
   getAllTransactions,
   getUserTransactions,
   approveTransaction,

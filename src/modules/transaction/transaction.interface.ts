@@ -16,6 +16,7 @@ export interface ITransaction {
   transaction_id: string;
   amount: number;
   fee: number;
+  commission: number;
   from_wallet: Types.ObjectId;
   to_wallet: Types.ObjectId;
   initiated_by: Types.ObjectId;

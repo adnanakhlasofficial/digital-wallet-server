@@ -4,6 +4,7 @@ import AppError from "../../helpers/app-error";
 import { WalletModel } from "../wallet/wallet.model";
 import { ITransaction, TransactionStatus } from "./transaction.interface";
 import { TransactionModel } from "./transaction.model";
+import { UserRole } from "../user/user.interface";
 
 const sendMoney = async (user: JwtPayload, payload: Partial<ITransaction>) => {
   const transactionPayload = {
@@ -11,6 +12,103 @@ const sendMoney = async (user: JwtPayload, payload: Partial<ITransaction>) => {
     initiated_by: user._id,
     ...payload,
   };
+
+  const fromWallet = await WalletModel.findById(user.wallet).populate(
+    "user",
+    "role -_id"
+  );
+
+  if (fromWallet?.user.role !== UserRole.USER) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      `Role '${fromWallet?.user.role}' is not authorized to transfer funds to '${UserRole.USER}' accounts.`
+    );
+  }
+
+  const toWallet = await WalletModel.findById(payload.to_wallet).populate(
+    "user",
+    "role -_id"
+  );
+
+  if (toWallet?.user.role !== UserRole.USER) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Sending money to an agent is not permitted. Please use the cash-out option instead."
+    );
+  }
+
+  const transaction = await TransactionModel.create(transactionPayload);
+  return transaction;
+};
+
+const cashOut = async (user: JwtPayload, payload: Partial<ITransaction>) => {
+  const transactionPayload = {
+    from_wallet: user.wallet,
+    initiated_by: user._id,
+    commission: 1.49,
+    ...payload,
+  };
+
+  const fromWallet = await WalletModel.findById(user.wallet).populate(
+    "user",
+    "role -_id"
+  );
+
+  if (fromWallet?.user.role !== UserRole.USER) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      `Role '${fromWallet?.user.role}' is not authorized to transfer funds to '${UserRole.AGENT}' accounts.`
+    );
+  }
+
+  const toWallet = await WalletModel.findById(payload.to_wallet).populate(
+    "user",
+    "role -_id"
+  );
+
+  if (toWallet?.user.role !== UserRole.AGENT) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      `Cash-out is restricted to users with the ${UserRole.AGENT} role.`
+    );
+  }
+
+  const transaction = await TransactionModel.create(transactionPayload);
+  return transaction;
+};
+
+const cashIn = async (user: JwtPayload, payload: Partial<ITransaction>) => {
+  const transactionPayload = {
+    from_wallet: user.wallet,
+    initiated_by: user._id,
+    fee: 0,
+    ...payload,
+  };
+
+  const fromWallet = await WalletModel.findById(user.wallet).populate(
+    "user",
+    "role -_id"
+  );
+
+  if (fromWallet?.user.role !== UserRole.AGENT) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      `Role '${fromWallet?.user.role}' is not authorized to transfer funds to '${UserRole.USER}' accounts.`
+    );
+  }
+
+  const toWallet = await WalletModel.findById(payload.to_wallet).populate(
+    "user",
+    "role -_id"
+  );
+  console.log(toWallet);
+  if (toWallet?.user.role !== UserRole.USER) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      `Cash-in is restricted to users with the ${UserRole.USER} role.`
+    );
+  }
+
   const transaction = await TransactionModel.create(transactionPayload);
   return transaction;
 };
@@ -163,4 +261,6 @@ export const TransactionService = {
   getUserTransactions,
   approveTransaction,
   reverseTransaction,
+  cashOut,
+  cashIn,
 };

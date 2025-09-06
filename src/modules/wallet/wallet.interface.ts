@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { IUser } from "../user/user.interface";
 
 export enum WalletStatus {
   ACTIVE = "ACTIVE",
@@ -8,7 +9,7 @@ export enum WalletStatus {
 
 export interface IWallet {
   _id?: Types.ObjectId;
-  user: Types.ObjectId;
+  user: IUser;
   balance: number;
   status: WalletStatus;
   createdAt: Date;

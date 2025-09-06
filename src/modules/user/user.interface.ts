@@ -17,6 +17,7 @@ export interface IUser {
   name: string;
   phone: string;
   password: string;
+  newPassword?: string;
   role: UserRole;
   status: UserStatus;
   wallet?: Types.ObjectId;
