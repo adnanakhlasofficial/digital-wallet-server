@@ -2,7 +2,15 @@ import { UserRole } from "../user/user.interface";
 import { WalletStatus } from "./wallet.interface";
 import { WalletModel } from "./wallet.model";
 
-const getAllWallets = async () => {
+const getAllWallets = async (query: any) => {
+  const sortOrder = query.sort === "asc" ? 1 : query.sort === "desc" ? -1 : 1;
+
+  const limit = Number(query.limit) || 10;
+  const page = Number(query.page) || 1;
+  const skip = (page - 1) * limit;
+  const totalWallet = await WalletModel.countDocuments();
+  const totalPage = Math.ceil(totalWallet / limit);
+
   const wallets = await WalletModel.aggregate([
     {
       $lookup: {
@@ -19,6 +27,15 @@ const getAllWallets = async () => {
       $match: { "user.role": { $ne: UserRole.ADMIN } },
     },
     {
+      $sort: { balance: sortOrder },
+    },
+    {
+      $limit: limit,
+    },
+    {
+      $skip: skip,
+    },
+    {
       $project: {
         balance: 1,
         status: 1,
@@ -29,7 +46,9 @@ const getAllWallets = async () => {
       },
     },
   ]);
-  return wallets;
+  const meta = { limit, page, totalWallet, totalPage };
+
+  return { wallets, meta };
 };
 
 const getSingleWallet = async (payload: string) => {

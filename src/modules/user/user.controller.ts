@@ -16,12 +16,14 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const users = await UserService.getAllUsers();
+  const query = req.query;
+  const { users, meta } = await UserService.getAllUsers(query);
   sendResponse(res, {
     status: httpStatus.OK,
     success: true,
     message: "All users retrieved successfully",
     data: users,
+    meta,
   });
 });
 
@@ -49,7 +51,6 @@ const getUserMe = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.user);
   const id = req.user._id;
   const payload = req.body;
   const updateUser = await UserService.updateUser(id, payload);

@@ -29,12 +29,29 @@ const createUser = async (payload: Partial<IUser>) => {
   return user;
 };
 
-const getAllUsers = async () => {
-  const users = await UserModel.find({})
+const getAllUsers = async (query: any) => {
+  const searchField: string[] = ["phone", "name", "role"];
+
+  const search = query.user || "";
+  const limit = Number(query.limit) || 10;
+  const page = Number(query.page) || 1;
+  const skip = (page - 1) * limit;
+  const totalUser = await UserModel.countDocuments();
+  const totalPage = Math.ceil(totalUser / limit);
+
+  const users = await UserModel.find({
+    $or: searchField.map((field) => ({
+      [field]: { $regex: search, $options: "i" },
+    })),
+  })
+    .limit(limit)
+    .skip(skip)
     .select("-password")
     .populate("wallet", "-_id -user");
 
-  return users;
+  const meta = { limit, page, totalUser, totalPage };
+
+  return { users, meta };
 };
 
 const getSingleUser = async (payload: string) => {
@@ -79,9 +96,10 @@ const updateUser = async (id: string, payload: Partial<IUser>) => {
 
   const update = await UserModel.findByIdAndUpdate(id, payload, {
     new: true,
+    runValidators: true,
   });
 
-  const { password, ...updateUser } = update?.toObject();
+  const { password, ...updateUser } = update?.toObject() as Partial<IUser>;
 
   return updateUser;
 };

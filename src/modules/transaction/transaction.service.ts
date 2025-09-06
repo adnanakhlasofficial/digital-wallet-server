@@ -113,8 +113,22 @@ const cashIn = async (user: JwtPayload, payload: Partial<ITransaction>) => {
   return transaction;
 };
 
-const getAllTransactions = async () => {
-  const allTransactions = await TransactionModel.find({})
+const getAllTransactions = async (query: any) => {
+  const searchField: string[] = ["status", "transaction_id"];
+  const search = query.search || "";
+  const limit = Number(query.limit) || 10;
+  const page = Number(query.page) || 1;
+  const skip = (page - 1) * limit;
+  const totalTransaction = await TransactionModel.countDocuments();
+  const totalPage = Math.ceil(totalTransaction / limit);
+
+  const allTransactions = await TransactionModel.find({
+    $or: searchField.map((field) => ({
+      [field]: { $regex: search, $options: "i" },
+    })),
+  })
+    .limit(limit)
+    .skip(skip)
     .populate({
       path: "from_wallet",
       select: "balance status -_id",
@@ -132,7 +146,10 @@ const getAllTransactions = async () => {
       },
     })
     .populate("initiated_by", "name phone role status -_id");
-  return allTransactions;
+
+  const meta = { limit, page, totalTransaction, totalPage };
+
+  return { allTransactions, meta };
 };
 
 const getUserTransactions = async (id: string) => {

@@ -44,12 +44,16 @@ const cashIn = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllTransactions = catchAsync(async (req: Request, res: Response) => {
-  const allTransactions = await TransactionService.getAllTransactions();
+  const query = req.query;
+  const { allTransactions, meta } = await TransactionService.getAllTransactions(
+    query
+  );
   sendResponse(res, {
     status: httpStatus.OK,
     success: true,
     message: "All transactions retrieved successfully",
     data: allTransactions,
+    meta: meta,
   });
 });
 
