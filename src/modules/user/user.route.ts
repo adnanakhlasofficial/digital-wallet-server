@@ -12,7 +12,11 @@ router.post(
   validateRequest(createUserZodSchema),
   UserController.createUser
 );
-router.get("/all-users", checkAuth(UserRole.ADMIN), UserController.getAllUsers);
+router.get(
+  "/all-users",
+  checkAuth(UserRole.ADMIN, UserRole.AGENT, UserRole.USER),
+  UserController.getAllUsers
+);
 router.get(
   "/me",
   checkAuth(UserRole.ADMIN, UserRole.AGENT, UserRole.USER),
@@ -24,6 +28,10 @@ router.put(
   checkAuth(UserRole.ADMIN, UserRole.AGENT, UserRole.USER),
   UserController.updateUser
 );
-router.get("/:id", UserController.getSingleUser);
+router.get(
+  "/:id",
+  checkAuth(UserRole.ADMIN, UserRole.AGENT, UserRole.USER),
+  UserController.getSingleUser
+);
 
 export const UserRouter = router;

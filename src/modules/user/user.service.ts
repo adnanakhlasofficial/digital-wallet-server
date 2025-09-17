@@ -39,15 +39,16 @@ const getAllUsers = async (query: any) => {
   const totalUser = await UserModel.countDocuments();
   const totalPage = Math.ceil(totalUser / limit);
 
-  const users = await UserModel.find({
-    $or: searchField.map((field) => ({
-      [field]: { $regex: search, $options: "i" },
-    })),
-  })
+  const users = await UserModel.find({ role: { $ne: UserRole.ADMIN } })
+    .find({
+      $or: searchField.map((field) => ({
+        [field]: { $regex: search, $options: "i" },
+      })),
+    })
     .limit(limit)
     .skip(skip)
     .select("-password")
-    .populate("wallet", "-_id -user");
+    .populate("wallet", " -user");
 
   const meta = { limit, page, totalUser, totalPage };
 

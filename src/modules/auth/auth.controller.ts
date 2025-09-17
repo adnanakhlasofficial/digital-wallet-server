@@ -39,7 +39,6 @@ const refreshToken = async (req: Request, res: Response) => {
     status: httpStatus.OK,
     success: true,
     message: "Token refresh successfully",
-    data: newAccessToken,
   });
 };
 

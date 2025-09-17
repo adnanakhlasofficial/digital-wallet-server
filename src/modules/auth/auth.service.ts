@@ -37,8 +37,8 @@ const login = async (payload: Partial<ILogin>) => {
     _id: user._id,
   };
 
-  const accessToken = generateToken(jwtUser, env.JWT_ACCESS_SECRET, "1d");
-  const refreshToken = generateToken(jwtUser, env.JWT_REFRESH_SECRET, "30d");
+  const accessToken = generateToken(jwtUser, env.JWT_ACCESS_SECRET, env.JWT_ACCESS_EXPIRES_AT);
+  const refreshToken = generateToken(jwtUser, env.JWT_REFRESH_SECRET, env.JWT_REFRESH_EXPIRES_AT);
 
   return { accessToken, refreshToken, newUser };
 };
@@ -58,7 +58,7 @@ const refreshToken = async (payload: string) => {
   const { name, phone, role, status, _id, wallet } = user.toObject();
   const jwtUser = { name, phone, role, status, _id, wallet };
 
-  const newAccessToken = generateToken(jwtUser, env.JWT_ACCESS_SECRET, "1d");
+  const newAccessToken = generateToken(jwtUser, env.JWT_ACCESS_SECRET, env.JWT_ACCESS_EXPIRES_AT);
   return newAccessToken;
 };
 
